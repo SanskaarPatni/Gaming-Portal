@@ -2,26 +2,45 @@ const express = require('express');
 const { graphqlHTTP } = require('express-graphql');
 const { buildSchema } = require('graphql');
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs')
 
 //importing models
 const Game = require('./models/game');
-
+const Player = require('./models/player');
 const app = express();
-
+//searchGamesCompanyWise(company:String!):[Game!]!
 app.use('/graphql', graphqlHTTP({
     schema: buildSchema(`
     type Game{
+        _id:ID!
         name:String!
         genre:String!
         price:Float!
-        company:String!
+        ageLimit:Int!
+        creator:Player!
+    }
+
+    type Player{
+        _id:ID!
+        email:String!
+        password:String
+        name:String!  
+        age:Int! 
+        createdGames:[Game!]
     }
 
     input GameInput{
         name:String!
         genre:String!
         price:Float!
-        company:String!
+        ageLimit:Int!
+    }
+
+    input PlayerInput{
+        email:String!
+        password:String
+        name:String!  
+        age:Int! 
     }
 
     type RootQuery{
@@ -29,11 +48,11 @@ app.use('/graphql', graphqlHTTP({
         searchGamesNameWise(name:String!):[Game!]!
         searchGamesLowPrice(price:Float!):[Game!]!
         searchGamesGenreWise(genre:String!):[Game!]!
-        searchGamesCompanyWise(company:String!):[Game!]!
     }
 
     type RootMutation{
         addGame(gameInput:GameInput):Game 
+        addPlayer(playerInput:PlayerInput):Player
     }
     schema{
         query:RootQuery
@@ -65,21 +84,62 @@ app.use('/graphql', graphqlHTTP({
                 }
             })
         },
-        searchGamesCompanyWise: args => {
-            return Game.find({
-                "company": {
-                    $regex: `${args.company}`
-                }
-            })
-        },
+        // searchGamesCompanyWise: args => {
+        //     return Game.find({
+        //         "company": {
+        //             $regex: `${args.company}`
+        //         }
+        //     })
+        // },
         addGame: args => {
             const game = new Game({
                 name: args.gameInput.name,
                 genre: args.gameInput.genre,
-                company: args.gameInput.company,
                 price: args.gameInput.price,
+                ageLimit: args.gameInput.ageLimit,
+                creator: '5f0e0faf5f871d286994524f'
             });
-            return game.save();
+            let createdGame;
+            return game.save()
+                .then(result => {
+                    createdGame = { ...result._doc, _id: result._doc._id.toString() }
+                    return Player.findById('5f0e0faf5f871d286994524f')
+                })
+                .then(player => {
+                    if (!player) {
+                        throw new Error('Player does not exist!');
+                    }
+                    player.createdGames.push(game);
+                    return player.save();
+                })
+                .then(result => {
+                    return createdGame;
+                })
+                .catch(err => {
+                    console.log(err);
+                    throw (err);
+                })
+        },
+        addPlayer: args => {
+            return Player.findOne({ email: args.playerInput.email }).then(user => {
+                if (user) throw new Error('User exists already.');
+                return bcrypt.hash(args.playerInput.password, 12)
+            })
+                .then(hashedPassword => {
+                    const player = new Player({
+                        email: args.playerInput.email,
+                        password: hashedPassword,
+                        name: args.playerInput.name,
+                        age: args.playerInput.age
+                    });
+                    return player.save();
+                })
+                .then(result => {
+                    return { ...result._doc, password: null, _id: result.id }
+                })
+                .catch(err => {
+                    throw err;
+                })
         }
     },
     graphiql: true

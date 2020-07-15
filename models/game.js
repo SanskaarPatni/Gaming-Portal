@@ -17,15 +17,18 @@ const gameSchema = new Schema({
         required: true,
         unique: true
     },
-    company: {
-        type: String,
+    ageLimit: {
+        type: Number,
         required: true,
-        unique: true
     },
     price: {
         type: Number,
         required: true,
     },
+    creator: {
+        type: Schema.Types.ObjectId,
+        ref: 'Player'
+    }
     //pregameIds: [prereqSchema]
 }
 );
