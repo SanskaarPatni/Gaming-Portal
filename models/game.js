@@ -15,7 +15,6 @@ const gameSchema = new Schema({
     genre: {
         type: String,
         required: true,
-        unique: true
     },
     ageLimit: {
         type: Number,
