@@ -28,6 +28,12 @@ module.exports = buildSchema(`
         createdGames:[Game!]
     }
 
+    type AuthData{
+        userId:ID!
+        token:String!
+        tokenExpiration:Int!
+    }
+
     input GameInput{
         name:String!
         genre:String!
@@ -50,6 +56,7 @@ module.exports = buildSchema(`
         searchGamesGenreWise(genre:String!):[Game!]!
         searchPlayersNameWise(name:String!):[Player!]!
         bookings:[Booking!]!
+        login(email:String!,password:String!):AuthData!
     }
 
     type RootMutation{

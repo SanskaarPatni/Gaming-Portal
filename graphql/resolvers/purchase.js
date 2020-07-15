@@ -7,7 +7,9 @@ const { transformBooking, transformGame } = require('./helper');
 
 
 module.exports = {
-    bookings: async () => {
+    bookings: async (args, req) => {
+        if (!req.isAuth)
+            throw new Error('Unauthenticated');
         try {
             const bookings = await Booking.find({})
             return bookings.map(booking => {
@@ -17,16 +19,20 @@ module.exports = {
             throw err
         }
     },
-    purchaseGame: async args => {
+    purchaseGame: async (args, req) => {
+        if (!req.isAuth)
+            throw new Error('Unauthenticated');
         const fetchedGame = await Game.findOne({ _id: args.gameId })
         const booking = new Booking({
-            player: '5f0e0fc85f871d2869945250',
+            player: req.userId,
             game: fetchedGame
         })
         const result = await booking.save();
         return transformBooking(result);
     },
-    cancelPurchase: async args => {
+    cancelPurchase: async (args, req) => {
+        if (!req.isAuth)
+            throw new Error('Unauthenticated');
         try {
             const booking = await Booking.findById(args.bookingId).populate('game');
             const game = transformGame(booking.game)

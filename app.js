@@ -2,11 +2,13 @@ const express = require('express');
 const { graphqlHTTP } = require('express-graphql');
 const mongoose = require('mongoose');
 
+const isAuth = require('./middleware/isauth');
 const graphQlSchema = require('./graphql/schema/index');
 const graphQlResolvers = require('./graphql/resolvers/index');
 
 const app = express();
 
+app.use(isAuth);
 
 app.use('/graphql', graphqlHTTP({
     schema: graphQlSchema,

@@ -36,19 +36,21 @@ module.exports = {
             }
         })
     },
-    addGame: args => {
+    addGame: (args, req) => {
+        if (!req.isAuth)
+            throw new Error('Unauthenticated');
         const game = new Game({
             name: args.gameInput.name,
             genre: args.gameInput.genre,
             price: args.gameInput.price,
             ageLimit: args.gameInput.ageLimit,
-            creator: '5f0e0fc85f871d2869945250'
+            creator: req.userId
         });
         let createdGame;
         return game.save()
             .then(result => {
                 createdGame = transformGame(result);
-                return Player.findById('5f0e0fc85f871d2869945250')
+                return Player.findById(req.userId)
             })
             .then(player => {
                 if (!player) {

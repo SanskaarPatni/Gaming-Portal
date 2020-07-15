@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs')
-
+const jwt = require('jsonwebtoken');
 //Importing Mongoose Schema
 const Player = require('../../models/player');
 
@@ -54,4 +54,18 @@ module.exports = {
                 throw err;
             })
     },
+    login: async ({ email, password }) => {
+        const user = await Player.findOne({ email: email });
+        if (!user) {
+            throw new Error('User does not exist.');
+        }
+        const isEqual = await bcrypt.compare(password, user.password);
+        if (!isEqual) {
+            throw new Error('Invalid Credentials!')
+        }
+        const token = jwt.sign({ userId: user.id, email: user.email }, 'secretkey', {
+            expiresIn: '1h'
+        });
+        return { userId: user.id, token: token, tokenExpiration: 1 }
+    }
 }
