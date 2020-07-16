@@ -38,7 +38,7 @@ const dateToString = date => new Date(date).toISOString();
 const transformBooking = booking => {
     return {
         ...booking._doc,
-        _id: booking.id,
+        _id: booking._id,
         player: player.bind(this, booking._doc.player),
         game: game.bind(this, booking._doc.game),
         createdAt: dateToString(booking._doc.createdAt),
@@ -53,7 +53,15 @@ const transformGame = game => {
     };
 }
 
+const transformPlayer = player => {
+    return {
+        ...player._doc,
+        _id: player._id,
+        password: null,
+        createdGames: games.bind(this, player.createdGames)
+    }
+}
 
-
+exports.transformPlayer = transformPlayer;
 exports.transformGame = transformGame;
 exports.transformBooking = transformBooking;

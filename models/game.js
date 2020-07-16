@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const prereqSchema = new Schema({
-    pregameIds: {
-        type: String
-    }
-});
 const gameSchema = new Schema({
     name: {
         type: String,
@@ -28,7 +23,6 @@ const gameSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Player'
     }
-    //pregameIds: [prereqSchema]
 }
 );
 const Game = mongoose.model('Game', gameSchema);

@@ -4,6 +4,8 @@ const config = require('config');
 //Importing Mongoose Schema
 const Player = require('../../models/player');
 
+//Import helper functions
+const { transformPlayer } = require('./helper');
 module.exports = {
     players: () => {
         return Player.find({}).populate('createdGames').populate('friends')
@@ -83,9 +85,10 @@ module.exports = {
         if (!req.isAuth)
             throw new Error('Unauthenticated');
         else {
-            const player = await Player.findById(req.userId).populate('friends');
-            return player.friends;
-
+            const playerr = await Player.findById(req.userId).populate('friends');
+            return playerr.friends.map(player => {
+                return transformPlayer(player)
+            });
         }
     }
 }

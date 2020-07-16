@@ -1,10 +1,10 @@
 //Importing Mongoose Schema
 const Booking = require('../../models/booking');
 const Game = require('../../models/game');
+const Player = require('../../models/player');
 
 //Importing functions 
 const { transformBooking, transformGame } = require('./helper');
-
 
 module.exports = {
     bookings: async (args, req) => {
@@ -22,13 +22,19 @@ module.exports = {
     purchaseGame: async (args, req) => {
         if (!req.isAuth)
             throw new Error('Unauthenticated');
-        const fetchedGame = await Game.findOne({ _id: args.gameId })
-        const booking = new Booking({
-            player: req.userId,
-            game: fetchedGame
-        })
-        const result = await booking.save();
-        return transformBooking(result);
+        const fetchedGame = await Game.findOne({ _id: args.gameId });
+        const fetchedUser = await Player.findById(req.userId);
+        if (fetchedGame.ageLimit > fetchedUser.age) {
+            throw new Error('Grow up this shit aint for your age!!')
+        }
+        else {
+            const booking = new Booking({
+                player: req.userId,
+                game: fetchedGame
+            })
+            const result = await booking.save();
+            return transformBooking(result);
+        }
     },
     cancelPurchase: async (args, req) => {
         if (!req.isAuth)
