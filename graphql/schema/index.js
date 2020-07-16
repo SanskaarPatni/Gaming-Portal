@@ -2,7 +2,6 @@ const { buildSchema } = require('graphql');
 
 
 module.exports = buildSchema(`
-
     type Booking{
         _id:ID!
         player:Player!
@@ -26,6 +25,7 @@ module.exports = buildSchema(`
         name:String!  
         age:Int! 
         createdGames:[Game!]
+        friends:[Player!]
     }
 
     type AuthData{
@@ -34,34 +34,22 @@ module.exports = buildSchema(`
         tokenExpiration:Int!
     }
 
-    input GameInput{
-        name:String!
-        genre:String!
-        price:Float!
-        ageLimit:Int!
-    }
-
-    input PlayerInput{
-        email:String!
-        password:String
-        name:String!  
-        age:Int! 
-    }
-
     type RootQuery{
         games:[Game!]!
         players:[Player!]!
+        bookings:[Booking!]!
+        login(email:String!,password:String!):AuthData!
         searchGamesNameWise(name:String!):[Game!]!
         searchGamesLowPrice(price:Float!):[Game!]!
         searchGamesGenreWise(genre:String!):[Game!]!
         searchPlayersNameWise(name:String!):[Player!]!
-        bookings:[Booking!]!
-        login(email:String!,password:String!):AuthData!
+        getFriends:[Player!]
     }
 
     type RootMutation{
-        addGame(gameInput:GameInput):Game 
-        addPlayer(playerInput:PlayerInput):Player
+        addGame(name:String!,genre:String!,price:Float!,ageLimit:Int!):Game 
+        addPlayer(email:String!,password:String,name:String!,age:Int!):Player
+        addFriend(personId:ID!):Player!
         purchaseGame(gameId:ID!):Booking!
         cancelPurchase(bookingId:ID!):Game!
     }

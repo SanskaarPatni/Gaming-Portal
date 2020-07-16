@@ -39,32 +39,35 @@ module.exports = {
     addGame: (args, req) => {
         if (!req.isAuth)
             throw new Error('Unauthenticated');
-        const game = new Game({
-            name: args.gameInput.name,
-            genre: args.gameInput.genre,
-            price: args.gameInput.price,
-            ageLimit: args.gameInput.ageLimit,
-            creator: req.userId
-        });
-        let createdGame;
-        return game.save()
-            .then(result => {
-                createdGame = transformGame(result);
-                return Player.findById(req.userId)
-            })
-            .then(player => {
-                if (!player) {
-                    throw new Error('Player does not exist!');
-                }
-                player.createdGames.push(game);
-                return player.save();
-            })
-            .then(result => {
-                return createdGame;
-            })
-            .catch(err => {
-                console.log(err);
-                throw (err);
-            })
+        else {
+            const game = new Game({
+                name: args.name,
+                genre: args.genre,
+                price: args.price,
+                ageLimit: args.ageLimit,
+                creator: req.userId
+            });
+            let createdGame;
+            return game.save()
+                .then(result => {
+                    createdGame = transformGame(result);
+                    return Player.findById(req.userId)
+                })
+                .then(player => {
+                    if (!player) {
+                        throw new Error('Player does not exist!');
+                    }
+                    player.createdGames.push(game);
+                    return player.save();
+                })
+                .then(result => {
+                    return createdGame;
+                })
+                .catch(err => {
+                    console.log(err);
+                    throw (err);
+                })
+        }
+
     },
 }
