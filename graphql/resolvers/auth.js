@@ -55,13 +55,13 @@ module.exports = {
         if (!req.isAuth)
             throw new Error('Unauthenticated');
         else {
-            const followedPlayer = await Player.findById(args.personId);
+            const followedPlayer = await Player.findById(args.playerId);
             if (!followedPlayer) {
                 throw new Error('No player with such ID')
             }
             else {
                 const player = await Player.findById(req.userId);
-                player.following.push(args.personId);
+                player.following.push(args.playerId);
                 followedPlayer.notifications.push(`${req.userId} started following you!`);
                 await followedPlayer.save();
                 await player.save();

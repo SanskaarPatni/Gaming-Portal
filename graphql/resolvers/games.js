@@ -62,7 +62,7 @@ module.exports = {
                 name: args.name,
                 genre: args.genre,
                 price: args.price,
-                ageLimit: args.ageLimit,
+                minAge: args.minAge,
                 creator: req.userId
             });
             let createdGame;

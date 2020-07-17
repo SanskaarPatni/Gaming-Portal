@@ -60,7 +60,7 @@ module.exports = {
                 throw new Error("No game matching this id");
             }
             const fetchedUser = await Player.findById(req.userId);
-            if (fetchedGame.ageLimit > fetchedUser.age) {
+            if (fetchedGame.minAge > fetchedUser.age) {
                 throw new Error('You do not have the minimum age required to play this game.')
             }
             else {
@@ -68,7 +68,7 @@ module.exports = {
                     player: req.userId,
                     game: fetchedGame
                 });
-                fetchedGame.downloads = +1;
+                fetchedGame.downloads += 1;
                 await fetchedGame.save();
                 fetchedUser.purchasedGames.push(fetchedGame);
                 await fetchedUser.save();

@@ -51,9 +51,9 @@ module.exports = buildSchema(`
     }
 
     type RootMutation{
-        addGame(name:String!,genre:String!,price:Float!,ageLimit:Int!):Game 
+        addGame(name:String!,genre:String!,price:Float!,minAge:Int!):Game 
         addPlayer(email:String!,password:String!,name:String!,age:Int!):Player
-        followPlayer(personId:ID!):Player!
+        followPlayer(playerId:ID!):Player!
         purchaseGame(gameId:ID!):Booking!
         cancelPurchase(bookingId:ID!):Game!
     }
