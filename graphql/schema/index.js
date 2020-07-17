@@ -17,6 +17,7 @@ module.exports = buildSchema(`
         minAge:Int!
         creator:Player!
         downloads:Int!
+        prereqGames:[Game!]
     }
 
     type Player{

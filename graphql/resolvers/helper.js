@@ -54,7 +54,8 @@ const transformGame = game => {
     return {
         ...game._doc,
         _id: game._id,
-        creator: player.bind(this, game.creator)
+        creator: player.bind(this, game.creator),
+        prereqGames: games.bind(this, game.prereqGames)
     };
 }
 
