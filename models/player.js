@@ -5,7 +5,6 @@ const playerSchema = new Schema({
     name: {
         type: String,
         required: true,
-        unique: true
     },
     age: {
         type: Number,
@@ -13,7 +12,8 @@ const playerSchema = new Schema({
     },
     email: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     password: {
         type: String,
@@ -25,10 +25,21 @@ const playerSchema = new Schema({
             ref: 'Game'
         }
     ],
-    friends: [
+    purchasedGames: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Game'
+        }
+    ],
+    following: [
         {
             type: Schema.Types.ObjectId,
             ref: 'Player'
+        }
+    ],
+    notifications: [
+        {
+            type: String,
         }
     ]
 }

@@ -6,15 +6,14 @@ const Player = require('../../models/player');
 
 //Import helper functions
 const { transformPlayer } = require('./helper');
+
 module.exports = {
     players: () => {
-        return Player.find({}).populate('createdGames').populate('friends')
+        return Player.find({})
+            //.populate('createdGames').populate('friends')
             .then(players => {
                 return players.map(player => {
-                    return {
-                        ...player._doc,
-                        password: null,
-                    }
+                    return transformPlayer(player)
                 })
             })
     },
@@ -23,13 +22,11 @@ module.exports = {
             "name": {
                 $regex: `${args.name}`
             }
-        }).populate('createdGames')
+        })
+            //.populate('createdGames')
             .then(players => {
                 return players.map(player => {
-                    return {
-                        ...player._doc,
-                        password: null
-                    }
+                    return transformPlayer(player);
                 });
             });
     },
@@ -48,23 +45,28 @@ module.exports = {
                 return player.save();
             })
             .then(result => {
-                return {
-                    ...result._doc,
-                    password: null,
-                    _id: result.id
-                }
+                return transformPlayer(result);
             })
             .catch(err => {
                 throw err;
             })
     },
-    addFriend: async (args, req) => {
+    followPlayer: async (args, req) => {
         if (!req.isAuth)
             throw new Error('Unauthenticated');
         else {
-            const player = await Player.findById(req.userId);
-            player.friends.push(args.personId);
-            return player.save();
+            const followedPlayer = await Player.findById(args.personId);
+            if (!followedPlayer) {
+                throw new Error('No player with such ID')
+            }
+            else {
+                const player = await Player.findById(req.userId);
+                player.following.push(args.personId);
+                followedPlayer.notifications.push(`${req.userId} started following you!`);
+                await followedPlayer.save();
+                await player.save();
+                return transformPlayer(player);
+            }
         }
     },
     login: async ({ email, password }) => {
@@ -81,14 +83,22 @@ module.exports = {
         });
         return { userId: user.id, token: token, tokenExpiration: 1 }
     },
-    getFriends: async (args, req) => {
+    getFollowing: async (args, req) => {
         if (!req.isAuth)
             throw new Error('Unauthenticated');
         else {
-            const playerr = await Player.findById(req.userId).populate('friends');
-            return playerr.friends.map(player => {
+            const playerr = await Player.findById(req.userId);
+            return playerr.following.map(player => {
                 return transformPlayer(player)
             });
         }
-    }
+    },
+    getNotifications: async (args, req) => {
+        if (!req.isAuth)
+            throw new Error('Unauthenticated');
+        else {
+            const player = await Player.findById(req.userId);
+            return player.notifications;
+        }
+    },
 }

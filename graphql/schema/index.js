@@ -14,8 +14,9 @@ module.exports = buildSchema(`
         name:String!
         genre:String!
         price:Float!
-        ageLimit:Int!
+        minAge:Int!
         creator:Player!
+        downloads:Int!
     }
 
     type Player{
@@ -25,7 +26,8 @@ module.exports = buildSchema(`
         name:String!  
         age:Int! 
         createdGames:[Game!]
-        friends:[Player!]
+        following:[Player!]
+        purchasedGames:[Game!]
     }
 
     type AuthData{
@@ -36,20 +38,22 @@ module.exports = buildSchema(`
 
     type RootQuery{
         games:[Game!]!
-        players:[Player!]!
-        bookings:[Booking!]!
-        login(email:String!,password:String!):AuthData!
         searchGamesNameWise(name:String!):[Game!]!
         searchGamesLowPrice(price:Float!):[Game!]!
         searchGamesGenreWise(genre:String!):[Game!]!
+        topthreeDownloads:[Game!]
+        players:[Player!]!
+        login(email:String!,password:String!):AuthData!
         searchPlayersNameWise(name:String!):[Player!]!
-        getFriends:[Player!]
+        getFollowing:[Player!]
+        getNotifications:[String!]
+        bookings:[Booking!]!
     }
 
     type RootMutation{
         addGame(name:String!,genre:String!,price:Float!,ageLimit:Int!):Game 
-        addPlayer(email:String!,password:String,name:String!,age:Int!):Player
-        addFriend(personId:ID!):Player!
+        addPlayer(email:String!,password:String!,name:String!,age:Int!):Player
+        followPlayer(personId:ID!):Player!
         purchaseGame(gameId:ID!):Booking!
         cancelPurchase(bookingId:ID!):Game!
     }

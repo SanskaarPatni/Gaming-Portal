@@ -13,7 +13,6 @@ const games = gameIds => {
         })
         .catch(err => { throw err });
 }
-
 const game = gameId => {
     return Game.findById(gameId)
         .then(game => {
@@ -21,20 +20,26 @@ const game = gameId => {
         })
         .catch(err => { throw err })
 }
+const players = playerIds => {
+    return PLayer.find({ _id: { $in: playerIds } })
+        .then(players => {
+            return players.map(player => {
+                return transformPlayer(player);
+            });
+        })
+        .catch(err => { throw err });
+}
 const player = playerId => {
     return Player.findById(playerId)
         .then(player => {
-            return {
-                ...player._doc,
-                _id: player._id,
-                createdGames: games.bind(this, player.createdGames)
-            }
+            return transformPlayer(player);
         })
         .catch(err => {
             throw err;
         });
 }
 const dateToString = date => new Date(date).toISOString();
+
 const transformBooking = booking => {
     return {
         ...booking._doc,
@@ -58,10 +63,13 @@ const transformPlayer = player => {
         ...player._doc,
         _id: player._id,
         password: null,
-        createdGames: games.bind(this, player.createdGames)
+        createdGames: games.bind(this, player.createdGames),
+        purchasedGames: games.bind(this, player.purchasedGames),
+        following: players.bind(this, player.following)
     }
 }
 
+//Exports 
 exports.transformPlayer = transformPlayer;
 exports.transformGame = transformGame;
 exports.transformBooking = transformBooking;

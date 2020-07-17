@@ -11,7 +11,7 @@ const gameSchema = new Schema({
         type: String,
         required: true,
     },
-    ageLimit: {
+    minAge: {
         type: Number,
         required: true,
     },
@@ -22,6 +22,10 @@ const gameSchema = new Schema({
     creator: {
         type: Schema.Types.ObjectId,
         ref: 'Player'
+    },
+    downloads: {
+        type: Number,
+        default: 0
     }
 }
 );
