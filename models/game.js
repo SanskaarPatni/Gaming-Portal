@@ -26,7 +26,13 @@ const gameSchema = new Schema({
     downloads: {
         type: Number,
         default: 0
-    }
+    },
+    prereqGames: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Game'
+        }
+    ],
 }
 );
 const Game = mongoose.model('Game', gameSchema);

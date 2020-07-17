@@ -87,4 +87,24 @@ module.exports = {
                 })
         }
     },
+    addPrereqGames: async (args, req) => {
+        if (!req.isAuth)
+            throw new Error('You need to login to add prereq games!');
+        else {
+            const game = await Game.findById(args.gameId);
+            if (game.creator != req.userId) {
+                throw new Error('You need to be the creator of the game to add prereq games!');
+            }
+            for (var i = 0; i < args.arrayIds.length; i++) {
+                const gam = await Game.findById(args.arrayIds[i]);
+                if (!gam) {
+                    throw new Error(`Invalid id for a prereq game ${args.arrayIds[i]} ..Previous ids added as prereq games`);
+                }
+                else {
+                    game.prereqGames.push(gam);
+                }
+            }
+            return game.save();
+        }
+    }
 }

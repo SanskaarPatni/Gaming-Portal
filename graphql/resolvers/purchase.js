@@ -32,6 +32,14 @@ module.exports = {
                 throw new Error('You do not have the minimum age required to play this game.')
             }
             else {
+                /*if(fetchedUser.purchasedGames.length<fetchedGame.prereqGames.length){
+                    throw new Error('You have not played all the game prequels');
+                }*/
+                fetchedGame.prereqGames.forEach(game => {
+                    if (fetchedUser.purchasedGames.indexOf(game) == -1) {
+                        throw new Error(`You need to play/purchase prequel game: ${game}`);
+                    }
+                })
                 const booking = new Booking({
                     player: req.userId,
                     game: fetchedGame

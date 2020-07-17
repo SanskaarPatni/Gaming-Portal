@@ -56,6 +56,7 @@ module.exports = buildSchema(`
         followPlayer(playerId:ID!):Player!
         purchaseGame(gameId:ID!):Booking!
         cancelPurchase(bookingId:ID!):Game!
+        addPrereqGames(gameId:ID!,arrayIds:[ID!]!):Game!
     }
     schema{
         query:RootQuery
