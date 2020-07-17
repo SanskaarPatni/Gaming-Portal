@@ -56,7 +56,7 @@ module.exports = {
     },
     addGame: (args, req) => {
         if (!req.isAuth)
-            throw new Error('Unauthenticated');
+            throw new Error('You need to login to add games!');
         else {
             const game = new Game({
                 name: args.name,

@@ -10,7 +10,6 @@ const { transformPlayer } = require('./helper');
 module.exports = {
     players: () => {
         return Player.find({})
-            //.populate('createdGames').populate('friends')
             .then(players => {
                 return players.map(player => {
                     return transformPlayer(player)
@@ -23,7 +22,6 @@ module.exports = {
                 $regex: `${args.name}`
             }
         })
-            //.populate('createdGames')
             .then(players => {
                 return players.map(player => {
                     return transformPlayer(player);
@@ -53,7 +51,7 @@ module.exports = {
     },
     followPlayer: async (args, req) => {
         if (!req.isAuth)
-            throw new Error('Unauthenticated');
+            throw new Error('You need to login to follow players!');
         else {
             const followedPlayer = await Player.findById(args.playerId);
             if (!followedPlayer) {
@@ -65,14 +63,14 @@ module.exports = {
                 followedPlayer.notifications.push(`${req.userId} started following you!`);
                 await followedPlayer.save();
                 await player.save();
-                return transformPlayer(player);
+                return transformPlayer(followedPlayer);
             }
         }
     },
     login: async ({ email, password }) => {
         const user = await Player.findOne({ email: email });
         if (!user) {
-            throw new Error('User does not exist.');
+            throw new Error('Player does not exist.');
         }
         const isEqual = await bcrypt.compare(password, user.password);
         if (!isEqual) {
@@ -85,7 +83,7 @@ module.exports = {
     },
     getFollowing: async (args, req) => {
         if (!req.isAuth)
-            throw new Error('Unauthenticated');
+            throw new Error('You need to login to view who you are following!');
         else {
             const playerr = await Player.findById(req.userId);
             return playerr.following.map(player => {
@@ -95,7 +93,7 @@ module.exports = {
     },
     getNotifications: async (args, req) => {
         if (!req.isAuth)
-            throw new Error('Unauthenticated');
+            throw new Error('You need to login to check your notifications!');
         else {
             const player = await Player.findById(req.userId);
             return player.notifications;
